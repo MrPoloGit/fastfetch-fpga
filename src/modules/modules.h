@@ -27,6 +27,7 @@
 #include "modules/dns/dns.h"
 #include "modules/editor/editor.h"
 #include "modules/font/font.h"
+#include "modules/fpga/fpga.h"
 #include "modules/gamepad/gamepad.h"
 #include "modules/gpu/gpu.h"
 #include "modules/host/host.h"

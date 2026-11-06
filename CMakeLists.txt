@@ -124,7 +124,7 @@ option(ENABLE_WORDEXP "Enable using of wordexp(3) if available, instead of glob(
 option(ENABLE_LUA "Enable lua scripting for format strings" ON)
 option(ENABLE_LIBZFS "Enable libzfs" ON)
 option(ENABLE_WCWIDTH "Detect wide-width characters with wcwidth when calculating logo and separator width. Disable for a smaller and slightly faster build, but logos containing CJK/emoji may be measured too narrow and render incorrectly. Such usecases are uncommon." ON)
-set(DEFAULT_STRUCTURE "Title:Separator:OS:Host:Kernel:Uptime:Packages:Shell:Display:DE:WM:WMTheme:Theme:Icons:Font:Cursor:Terminal:TerminalFont:CPU:GPU:Memory:Swap:Disk:LocalIp:Battery:PowerAdapter:Locale:Break:Colors" CACHE STRING "Default module structure for detection")
+set(DEFAULT_STRUCTURE "Title:Separator:OS:Host:Kernel:Uptime:Packages:Shell:Display:DE:WM:WMTheme:Theme:Icons:Font:Cursor:Terminal:TerminalFont:CPU:GPU:FPGA:Memory:Swap:Disk:LocalIp:Battery:PowerAdapter:Locale:Break:Colors" CACHE STRING "Default module structure for detection")
 if(WIN32 AND NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
     option(ENABLE_WIN81_COMPAT "Enable legacy Windows compatibility (Windows 8.1 and later; Windows 7 unsupported)" ON)
 endif()
@@ -608,6 +608,7 @@ if(LINUX)
         src/detection/bootmgr/bootmgr_linux.c
         src/detection/brightness/brightness_linux.c
         src/detection/btrfs/btrfs_linux.c
+        src/detection/fpga/fpga_linux.c
         src/detection/chassis/chassis_linux.c
         src/detection/codec/codec_linux.c
         src/detection/cpu/cpu_linux.c
@@ -638,6 +639,7 @@ if(LINUX)
         src/detection/font/font_linux.c
         src/detection/gpu/gpu_linux.c
         src/detection/gpu/gpu_drm.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gpu/gpu_windows.c
         src/detection/gtk_qt/gtk.c
@@ -702,6 +704,7 @@ elseif(ANDROID)
         src/detection/bootmgr/bootmgr_nosupport.c
         src/detection/brightness/brightness_nosupport.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_nosupport.c
         src/detection/codec/codec_android.c
         src/detection/cpu/cpu_linux.c
@@ -789,6 +792,7 @@ elseif(FreeBSD)
         src/detection/bootmgr/bootmgr_bsd.c
         src/detection/brightness/brightness_bsd.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_bsd.c
         src/detection/codec/codec_linux.c
         src/detection/cpu/cpu_bsd.c
@@ -817,6 +821,7 @@ elseif(FreeBSD)
         src/detection/font/font_linux.c
         src/detection/gpu/gpu_bsd.c
         src/detection/gpu/gpu_drm.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gpu/gpu_bsddrm.c
         src/detection/gtk_qt/gtk.c
@@ -888,6 +893,7 @@ elseif(NetBSD)
         src/detection/bootmgr/bootmgr_bsd.c
         src/detection/brightness/brightness_nbsd.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_nbsd.c
         src/detection/codec/codec_linux.c
         src/detection/cpu/cpu_nbsd.c
@@ -915,6 +921,7 @@ elseif(NetBSD)
         src/detection/displayserver/linux/xlib.c
         src/detection/font/font_linux.c
         src/detection/gpu/gpu_nbsd.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_nbsd.c
@@ -974,6 +981,7 @@ elseif(OpenBSD)
         src/detection/bootmgr/bootmgr_bsd.c
         src/detection/brightness/brightness_obsd.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_windows.c
         src/detection/codec/codec_linux.c
         src/detection/cpu/cpu_obsd.c
@@ -1000,6 +1008,7 @@ elseif(OpenBSD)
         src/detection/displayserver/linux/xcb.c
         src/detection/displayserver/linux/xlib.c
         src/detection/font/font_linux.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gpu/gpu_obsd.c
         src/detection/gpu/gpu_drm.c
@@ -1062,6 +1071,7 @@ elseif(APPLE)
         src/detection/bootmgr/bootmgr_apple.c
         src/detection/brightness/brightness_apple.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/codec/codec_apple.c
         src/detection/cpu/cpu_apple.c
         src/detection/cpucache/cpucache_apple.c
@@ -1161,6 +1171,7 @@ elseif(WIN32)
         src/detection/bootmgr/bootmgr_windows.c
         src/detection/brightness/brightness_windows.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_windows.c
         src/detection/codec/codec_windows.cpp
         src/detection/cpu/cpu_windows.c
@@ -1233,6 +1244,7 @@ elseif(SunOS)
         src/detection/bootmgr/bootmgr_nosupport.c
         src/detection/brightness/brightness_nosupport.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_windows.c
         src/detection/cpu/cpu_sunos.c
         src/detection/cpucache/cpucache_shared.c
@@ -1262,6 +1274,7 @@ elseif(SunOS)
         src/detection/displayserver/linux/xlib.c
         src/detection/font/font_linux.c
         src/detection/gpu/gpu_sunos.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_windows.c
@@ -1318,6 +1331,7 @@ elseif(Haiku)
         src/detection/bootmgr/bootmgr_haiku.cpp
         src/detection/brightness/brightness_haiku.cpp
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_windows.c
         src/detection/cpu/cpu_haiku.c
         src/detection/cpucache/cpucache_shared.c
@@ -1334,6 +1348,7 @@ elseif(Haiku)
         src/detection/displayserver/displayserver_haiku.cpp
         src/detection/font/font_haiku.cpp
         src/detection/gpu/gpu_haiku.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_windows.c
@@ -1395,6 +1410,7 @@ elseif(GNU)
         src/detection/bootmgr/bootmgr_nosupport.c
         src/detection/brightness/brightness_nosupport.c
         src/detection/btrfs/btrfs_nosupport.c
+        src/detection/fpga/fpga_nosupport.c
         src/detection/chassis/chassis_nosupport.c
         src/detection/cpu/cpu_linux.c
         src/detection/cpucache/cpucache_nosupport.c
@@ -1418,6 +1434,7 @@ elseif(GNU)
         src/detection/displayserver/linux/xlib.c
         src/detection/font/font_linux.c
         src/detection/gpu/gpu_gnu.c
+        src/common/impl/pciid.c
         src/detection/gpu/gpu_pci.c
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_nosupport.c

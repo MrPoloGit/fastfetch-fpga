@@ -107,6 +107,9 @@ static FFModuleBaseInfo* F[] = {
 #if !FF_MODULE_DISABLE_FONT
     &ffFontModuleInfo,
 #endif
+#if !FF_MODULE_DISABLE_FPGA
+    &ffFPGAModuleInfo,
+#endif
     nullptr,
 };
 
